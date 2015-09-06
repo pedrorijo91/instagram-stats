@@ -1,0 +1,111 @@
+@(following: Seq[User], followers: Seq[User], both: Seq[User], followingNotFollowedBy: Seq[User], followersNotFollowing: Seq[User],
+        pendingRequests: Seq[User])
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Instagram Stats</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h3>What's the result?</h3>
+
+            <div class="well well-sm">
+                <dl class="dl-horizontal">
+                    <dt>You follow:</dt> <dd>@following.length</dd>
+                    <dt>Following you:</dt> <dd>@followers.length</dd>
+                    <dt>Both follow:</dt> <dd>@both.length</dd>
+                    <dt>Not following you back:</dt> <dd>@followingNotFollowedBy.length</dd>
+                    <dt>You don't follow back:</dt> <dd>@followersNotFollowing.length</dd>
+                    <dt>Pending requests:</dt> <dd>@pendingRequests.length</dd>
+                </dl>
+            </div>
+
+            <div>
+                    <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#following" aria-controls="following" role="tab" data-toggle="tab">Following</a></li>
+                    <li role="presentation"><a href="#followers" aria-controls="followers" role="tab" data-toggle="tab">Followers</a></li>
+                    <li role="presentation"><a href="#both" aria-controls="both" role="tab" data-toggle="tab">Both</a></li>
+                    <li role="presentation"><a href="#followingNotFollowedBy" aria-controls="followingNotFollowedBy" role="tab" data-toggle="tab">
+                        followingNotFollowedBy</a></li>
+                    <li role="presentation"><a href="#followersNotFollowing" aria-controls="followersNotFollowing" role="tab" data-toggle="tab">
+                        followersNotFollowing</a></li>
+                    <li role="presentation"><a href="#pendingRequests" aria-controls="pendingRequests" role="tab" data-toggle="tab">
+                        pendingRequests</a></li>
+                </ul>
+
+                    <!-- Tab panes -->
+                <div class="tab-content">
+
+                    @displayList(list: Seq[User]) = {
+                    @for(user <- list) {
+                        <p>
+                            <img src="@user.profilePhoto" alt=@user.username/>
+                            @if(user.name.isEmpty) {
+                                @user.username:
+                            } else {
+                                @user.name:
+                            }
+                            <a href="https://instagram.com/@user.username">@user.username</a>
+                        </p>
+                    }
+                    }
+
+                    <div role="tabpanel" class="tab-pane active" id="following">
+                    @if(following.isEmpty) {
+                        No following users
+                    } else {
+                        @displayList(following)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="followers">
+                    @if(followers.isEmpty) {
+                        No followers users
+                    } else {
+                        @displayList(followers)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="both">
+                    @if(both.isEmpty) {
+                        No both users
+                    } else {
+                        @displayList(both)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="followingNotFollowedBy">
+                    @if(followingNotFollowedBy.isEmpty) {
+                        No followingNotFollowedBy users
+                    } else {
+                        @displayList(followingNotFollowedBy)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="followersNotFollowing">
+                    @if(followersNotFollowing.isEmpty) {
+                        No followersNotFollowing users
+                    } else {
+                        @displayList(followersNotFollowing)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="pendingRequests">
+                    @if(pendingRequests.isEmpty) {
+                        No pendingRequests
+                    } else {
+                        @displayList(pendingRequests)
+                    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
