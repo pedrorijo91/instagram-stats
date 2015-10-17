@@ -1,8 +1,8 @@
 package controllers
 
 import models.User
-import play.api.Logger
 import play.api.mvc._
+import play.api.{Logger, Play}
 import services.Instagram
 
 class Application extends Controller {
@@ -61,7 +61,22 @@ class Application extends Controller {
           val pendingInRequests: Seq[User] = Instagram.fetchPendingIn(token)
           Logger.info("Got pendingInRequests: " + pendingInRequests.length)
 
-          Ok(views.html.insta(following, followers, both, followingNotFollowedBy, followersNotFollowing, pendingInRequests))
+
+          val ghostFeature: Option[Boolean] = Play.current.configuration.getBoolean("feature.ghost")
+          if(ghostFeature.isEmpty){
+            Logger.warn("Ghost feature configuration not found. Using default value")
+          }
+
+          val ghosts: Seq[User] = if (ghostFeature.getOrElse(false)) {
+            val ghostsFollowed: Seq[User] = Instagram.filterGhostUser(token, following)
+            Logger.info(s"Got ${ghostsFollowed.length} ghosts: ${ghostsFollowed.map(_.name).mkString(",")}")
+            ghostsFollowed
+          } else {
+            Logger.warn("Ghost feature disabled")
+            Seq()
+          }
+
+          Ok(views.html.insta(following, followers, both, followingNotFollowedBy, followersNotFollowing, pendingInRequests, ghosts))
         }
       }
     }

@@ -3,11 +3,10 @@ package services
 import controllers.routes
 import models.User
 import play.api.Play.current
-import play.api.libs.json.{JsLookupResult, JsSuccess, JsError}
+import play.api.libs.json.{JsError, JsLookupResult, JsSuccess}
 import play.api.libs.ws.{WS, WSResponse}
 import play.api.mvc.{AnyContent, Request}
 import play.api.{Logger, Play}
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -163,13 +162,40 @@ object Instagram {
       case JsSuccess(value, _) => {
         Logger.info("Parsed users: " + value.length)
         value
-      }      case JsError(errors) => {
+      }
+      case JsError(errors) => {
         Logger.error("Cannot parse User from data: " + errors)
         Nil
       }
     }
 
     users
+  }
+
+  def filterGhostUser(token: String, users: Seq[User]): Seq[User] = {
+
+    users.filter {
+      case user =>
+        val url: String = s"https://api.instagram.com/v1/users/${user.id}/?access_token=$token"
+
+        implicit val context = scala.concurrent.ExecutionContext.Implicits.global
+
+        //TODO 2 seconds timeout
+        //TODO check result
+        val result: WSResponse = Await.result(WS.url(url).get(), 2 seconds)
+
+        (result.json \ "data" \ "counts" \ "media").validate[Int] match {
+          case JsSuccess(value, _) => {
+            Logger.debug(s"User ${user.id} with $value posts")
+            if(value == 0) Logger.warn(s"Found user with 0 posts: ${user.id} - ${user.name}")
+            value == 0
+          }
+          case JsError(errors) => {
+            Logger.error(s"Cannot parse media count from data: $errors")
+            false
+          }
+        }
+    }
   }
 
 }
