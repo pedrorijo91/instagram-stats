@@ -1,5 +1,6 @@
+@import play.api.Play
 @(following: Seq[User], followers: Seq[User], both: Seq[User], followingNotFollowedBy: Seq[User], followersNotFollowing: Seq[User],
-        pendingRequests: Seq[User])
+        pendingRequests: Seq[User], ghosts: Seq[User])
 
 <!DOCTYPE html>
 
@@ -23,6 +24,7 @@
                     <dt>Not following you back:</dt> <dd>@followingNotFollowedBy.length</dd>
                     <dt>You don't follow back:</dt> <dd>@followersNotFollowing.length</dd>
                     <dt>Pending requests:</dt> <dd>@pendingRequests.length</dd>
+                    <dt>Ghost users followed:</dt> <dd>@ghosts.length</dd>
                 </dl>
             </div>
 
@@ -32,12 +34,10 @@
                     <li role="presentation" class="active"><a href="#following" aria-controls="following" role="tab" data-toggle="tab">Following</a></li>
                     <li role="presentation"><a href="#followers" aria-controls="followers" role="tab" data-toggle="tab">Followers</a></li>
                     <li role="presentation"><a href="#both" aria-controls="both" role="tab" data-toggle="tab">Both</a></li>
-                    <li role="presentation"><a href="#followingNotFollowedBy" aria-controls="followingNotFollowedBy" role="tab" data-toggle="tab">
-                        followingNotFollowedBy</a></li>
-                    <li role="presentation"><a href="#followersNotFollowing" aria-controls="followersNotFollowing" role="tab" data-toggle="tab">
-                        followersNotFollowing</a></li>
-                    <li role="presentation"><a href="#pendingRequests" aria-controls="pendingRequests" role="tab" data-toggle="tab">
-                        pendingRequests</a></li>
+                    <li role="presentation"><a href="#followingNotFollowedBy" aria-controls="followingNotFollowedBy" role="tab" data-toggle="tab">followingNotFollowedBy</a></li>
+                    <li role="presentation"><a href="#followersNotFollowing" aria-controls="followersNotFollowing" role="tab" data-toggle="tab">followersNotFollowing</a></li>
+                    <li role="presentation"><a href="#pendingRequests" aria-controls="pendingRequests" role="tab" data-toggle="tab">pendingRequests</a></li>
+                    <li role="presentation"><a href="#ghosts" aria-controls="ghosts" role="tab" data-toggle="tab">ghosts</a></li>
                 </ul>
 
                     <!-- Tab panes -->
@@ -102,6 +102,17 @@
                         No pendingRequests
                     } else {
                         @displayList(pendingRequests)
+                    }
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="ghosts">
+                    @if(ghosts.isEmpty) {
+                        No ghost users followed.
+                        @if(Play.current.configuration.getBoolean("feature.ghost").isEmpty) {
+                            It seems that this feature is not configured. Using default value that may be off.
+                        }
+                    } else {
+                        @displayList(ghosts)
                     }
                     </div>
                 </div>
