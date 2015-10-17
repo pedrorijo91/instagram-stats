@@ -1,4 +1,5 @@
 @import play.api.Play
+@import services.Config
 @(following: Seq[User], followers: Seq[User], both: Seq[User], followingNotFollowedBy: Seq[User], followersNotFollowing: Seq[User],
         pendingRequests: Seq[User], ghosts: Seq[User])
 
@@ -106,18 +107,18 @@
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="ghosts">
-                    @if(ghosts.isEmpty) {
-                        No ghost users followed.
-                        @if(Play.current.configuration.getBoolean("feature.ghost").isEmpty) {
-                            It seems that this feature is not configured. Using default value that may be off.
-                        } else {
-                        @if(! Play.current.configuration.getBoolean("feature.ghost").get) {
-                            It seems that this feature has been disabled
+                    @Config.ghostFeature match {
+                        case None => {
+                            It seems that this feature is not configured - Using default value: @Config.ghostFeatureDefault
                         }
+                        case Some(false) => {
+                            It seems that this feature has been disabled.
                         }
-                    } else {
-                        @displayList(ghosts)
+                        case _ => {
+                            
+                        }
                     }
+                    @displayList(ghosts)
                     </div>
                 </div>
             </div>
