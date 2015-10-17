@@ -110,6 +110,10 @@
                         No ghost users followed.
                         @if(Play.current.configuration.getBoolean("feature.ghost").isEmpty) {
                             It seems that this feature is not configured. Using default value that may be off.
+                        } else {
+                        @if(! Play.current.configuration.getBoolean("feature.ghost").get) {
+                            It seems that this feature has been disabled
+                        }
                         }
                     } else {
                         @displayList(ghosts)
